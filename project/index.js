@@ -1,31 +1,19 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const app = express();
+const path = require("path");
 
-const server = http.createServer((req, res) => {
-  let filePath;
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/about", (req, res) => res.sendFile(path.join(__dirname, "about.html")));
+app.get("/contact-me", (req, res) => res.sendFile(path.join(__dirname, "contact-me.html")));
+app.use((req, res) => res.status(404).sendFile(path.join(__dirname, "404.html")));
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send("Server Error");
+})
 
-  if (req.url === '/') {
-    filePath = path.join(__dirname, 'index.html');
-  } else if (req.url === '/about') {
-    filePath = path.join(__dirname, 'about.html');
-  } else if (req.url === '/contact-me') {
-    filePath = path.join(__dirname, 'contact-me.html');
-  } else {
-    filePath = path.join(__dirname, '404.html');
+app.listen(8080, (error) => {
+  if (error) {
+    throw error;
   }
-
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(500);
-      res.end('Server Error');
-    } else {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    }
-  });
-});
-
-server.listen(8080, () => {
-  console.log('Server running at http://localhost:8080');
-});
+  console.log("Server running at localhost:8080");
+})
